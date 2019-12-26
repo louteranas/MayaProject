@@ -1,7 +1,7 @@
 #! /usr/bin/env python2.7
 
 class Joint:
-    def __init__(self, name = "Unknown", isRoot = False, offset = [0,0,0], rotation = [0,0,0], translation = [0,0,0], child = None, parent = None):
+    def __init__(self, name = "Unknown", isRoot = False, transformationIndex = "-1", offset = [], rotation = [], translation = [], child = None, parent = None):
         self.name = name
         self.isRoot = isRoot
         self.offset = offset
@@ -9,6 +9,7 @@ class Joint:
         self.child = child
         self.translation = translation
         self.parent = parent
+        self.transformationIndex = transformationIndex
 
     def getRoot(self):
         parent = self.parent
@@ -19,9 +20,12 @@ class Joint:
     
     def setOffset(self, offset):
         self.offset = offset
-    
+
+    def setTransformationIndex(self, index):
+        self.transformationIndex = index
+
     def setRotation(self, rotation):
-        self.rotation = rotation
+        self.rotation.append(rotation)
     
     def addChild(self, child):
         if(self.child == None):
@@ -32,4 +36,7 @@ class Joint:
         self.parent = parent
     
     def setTranslation(self, translation):
-        self.translation = translation
+        if(self.isRoot):
+            self.translation.append(translation)
+        else:
+            print("Only Root can take a translation, Joints have offsets")
