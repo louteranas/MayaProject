@@ -17,7 +17,7 @@ class Joint:
             parent = parent.parent
         print(self.name + " root is : " + parent.name)
         return parent
-    
+
     def setOffset(self, offset):
         self.offset = offset
 
@@ -26,15 +26,15 @@ class Joint:
 
     def setRotation(self, rotation):
         self.rotation.append(rotation)
-    
+
     def addChild(self, child):
         if(self.child == None):
             self.child = []
         self.child.append(child)
-    
+
     def setParent(self, parent):
         self.parent = parent
-    
+
     def setTranslation(self, translation):
         if(self.isRoot):
             self.translation.append(translation)
