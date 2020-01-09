@@ -159,8 +159,6 @@ void parse(string argFile){
         string str;
         for (int i = 0; i < nbFrames; i++){
             getline(flux, str);
-            if(i < 3)
-            cout <<str <<endl;
             istringstream ss(str);
             ss >> rx >> ry >> rz >> tx >> ty >> tz;
             root->rotations.push_back(std::array<float, 3>({rx, ry, rz}));
