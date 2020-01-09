@@ -17,49 +17,54 @@ def parse(argFile = None):
         root = Joint()
         compteur = 0
         transformationIndex = 0
+        MayaNumber = 1
         for index, line in enumerate(lines):
             compteur += 1
             if(line == "HIERARCHY"):
-                print("Parsing the hierarchical model : ")
+                # print("Parsing the hierarchical model : ")
                 continue
             if("ROOT" in line):
-                print("Root")
+                # print("Root")
                 jointName = line.split(' ')[1]
                 root = Joint(jointName, True)
                 currentJoint = root
+                currentJoint.setNumMaya(MayaNumber)
+                MayaNumber += 1
                 continue
             if("OFFSET" in line):
-                print("Reading offset")
+                # print("Reading offset")
                 lineData = line.split(' ')
                 currentJoint.setOffset(lineData[1:])
                 continue
             if("CHANNELS" in line):
                 lineData = line.split(' ')
                 if(lineData[1] == "6"):
-                    print("Reading Root channel")
+                    # print("Reading Root channel")
                     currentJoint.setTransformationIndex(transformationIndex)
-                    print(currentJoint.transformationIndex)
+                    # print(currentJoint.transformationIndex)
                     transformationIndex += 6
                     continue
                 if(lineData[1] == "3"):
-                    print("Reading joint channel")
+                    # print("Reading joint channel")
                     currentJoint.setTransformationIndex(transformationIndex)
                     transformationIndex += 3
                     continue
             if("JOINT" in line):
                 # print("ltoes" in currentJoint.name)
 
-                print("Joint")
+                # print("Joint")
                 jointName = line.split(' ')[1]
                 joint = Joint(jointName, False)
-                if(currentJoint == None):
-                    print("Stooooooooooooop")
+                # if(currentJoint == None):
+                #     print("Stooooooooooooop")
                 joint.setParent(currentJoint)
                 currentJoint.addChild(joint)
                 currentJoint = joint
+                currentJoint.setNumMaya(MayaNumber)
+                MayaNumber += 1
                 continue
             if("End" in line):
-                print("End Joint")
+                # print("End Joint")
                 jointName = str(currentJoint.name + "-Child")
                 joint = Joint(jointName, False)
                 currentJoint.addChild(joint)
@@ -70,7 +75,7 @@ def parse(argFile = None):
                 currentJoint = currentJoint.parent
             if("MOTION" in line):
                 indexOfpos = index + 3
-                print("Arbre fini")
+                # print("Arbre fini")
                 # return root
         for index, line in enumerate(lines[indexOfpos:]):
             transformations = line.split(" ")
@@ -83,26 +88,16 @@ def parse(argFile = None):
 def applyTransformations(joint, transformations):
     if(joint.child == None):
         joint.rotation = []
-        print("\n\n\n Nope, cul de sac \n\n\n ")
+        # print("\n\n\n Nope, cul de sac \n\n\n ")
         return 
     if(joint.isRoot):
-        # print(joint.name)
-        # print("in root")
-        # print("Translation : " + str([transformations[joint.transformationIndex], transformations[joint.transformationIndex+1], transformations[joint.transformationIndex+2]]))
-        # print("Rotation : " + str([transformations[joint.transformationIndex+5], transformations[joint.transformationIndex+4], transformations[joint.transformationIndex+3]]))
-        joint.setTranslation([transformations[joint.transformationIndex], transformations[joint.transformationIndex+1], transformations[joint.transformationIndex+2]])
-        joint.setRotation([transformations[joint.transformationIndex+5], transformations[joint.transformationIndex+4], transformations[joint.transformationIndex+3]])
-        # print("resultat = " + str(joint.rotation))
+        joint.setTranslation([float(transformations[joint.transformationIndex]), float(transformations[joint.transformationIndex+1]), float(transformations[joint.transformationIndex+2])])
+        joint.setRotation([float(transformations[joint.transformationIndex+5]), float(transformations[joint.transformationIndex+4]), float(transformations[joint.transformationIndex+3])])
     else:
-        # print(joint.name)
-        # print("joint")
-        # print("Roation" +str([transformations[joint.transformationIndex+2], transformations[joint.transformationIndex+1], transformations[joint.transformationIndex]]))
-        joint.setRotation([transformations[joint.transformationIndex+2], transformations[joint.transformationIndex+1], transformations[joint.transformationIndex]])
+        joint.setRotation([float(transformations[joint.transformationIndex+2]), float(transformations[joint.transformationIndex+1]), float(transformations[joint.transformationIndex])])
         joint.rotation = [joint.rotation[-1]]
-        # print("resultat = " + str(joint.rotation))
 
     for child in joint.child:
-        # print(child.name)
         applyTransformations(child, transformations)
     
 
@@ -115,23 +110,19 @@ def printH(joint):
     if(joint.isRoot):
         print(joint.translation[:1], end=' ')
         print(joint.rotation[:1], end=' \n')
-    print(" Has children : ")
+    print(" Has children : ", end = '')
+    for child in joint.child:
+        print(child.name + " ", end = '')
+    print("\n") 
     liste = joint.child
-    for joints in liste:
-        print(joints.name + " " +  str(joints.transformationIndex) , end=' ') 
-    for joints in liste:
-        print(joints.rotation, end=' ')
+    # for joints in liste:
+    #     print(joints.name + " " +  str(joints.transformationIndex) , end=' ') 
+    # for joints in liste:
+    #     print(joints.rotation, end=' ')
     print('\n\n')
     for child in joint.child:
         printH(child)
 
 
 
-def main():
-    root = parse(sys.argv[1])
-    # for i in tqdm(range(10)):
-    #     continue
-    #    time.sleep(0.1)
-    printH(root)
 
-main()

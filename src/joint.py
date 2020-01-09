@@ -5,11 +5,13 @@ class Joint:
         self.name = name
         self.isRoot = isRoot
         self.offset = offset
+        self.position = (0, 0, 0)
         self.rotation = rotation
         self.child = child
         self.translation = translation
         self.parent = parent
         self.transformationIndex = transformationIndex
+        self.numMaya = 0
 
     def getRoot(self):
         parent = self.parent
@@ -19,8 +21,8 @@ class Joint:
         return parent
 
     def setOffset(self, offset):
-        self.offset = offset
-
+        self.offset = (float(offset[0]), float(offset[1]), float(offset[2]))
+        
     def setTransformationIndex(self, index):
         self.transformationIndex = index
 
@@ -32,8 +34,14 @@ class Joint:
             self.child = []
         self.child.append(child)
 
+    def setPosition(self, position):
+        self.position = (position[0], position[1], position[2])
+
     def setParent(self, parent):
         self.parent = parent
+
+    def setNumMaya(self, number):
+        self.numMaya = number
 
     def setTranslation(self, translation):
         if(self.isRoot):
