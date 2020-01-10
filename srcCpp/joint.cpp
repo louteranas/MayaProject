@@ -22,3 +22,15 @@ string Joint::getName(){
 void Joint::addChild(Joint* child){
     childs.push_back(child);
 }
+
+string Joint::toString(){
+    string s = this->name + ":\nChildren\n";
+    for(std::list<Joint*>::iterator  it = this->childs.begin(); it != this->childs.end(); ++it){
+      s += (*it) -> name + "\n";
+    }
+    if(this->parent != NULL){
+      s += "Parent\n";
+      s += this->parent->name + "\n";
+    }
+    return s;
+}
