@@ -70,6 +70,7 @@ def parse(argFile = None):
                 currentJoint.addChild(joint)
                 joint.setParent(currentJoint)
                 currentJoint = joint
+                MayaNumber += 1
                 continue
             if("}" in line):
                 currentJoint = currentJoint.parent
@@ -81,22 +82,14 @@ def parse(argFile = None):
             transformations = line.split(" ")
             if(not transformations == [''] and index == 0):
                 transformations = [item for item in transformations]
-                # print(transformations)
+                # print(len(transformations))
                 applyTransformations(root, transformations)
     return root
             
 def applyTransformations(joint, transformations):
     if(joint.child == None):
-        joint.rotation = []
-        # print("\n\n\n Nope, cul de sac \n\n\n ")
         return 
-    if(joint.isRoot):
-        joint.setTranslation([float(transformations[joint.transformationIndex]), float(transformations[joint.transformationIndex+1]), float(transformations[joint.transformationIndex+2])])
-        joint.setRotation([float(transformations[joint.transformationIndex+5]), float(transformations[joint.transformationIndex+4]), float(transformations[joint.transformationIndex+3])])
-    else:
-        joint.setRotation([float(transformations[joint.transformationIndex+2]), float(transformations[joint.transformationIndex+1]), float(transformations[joint.transformationIndex])])
-        joint.rotation = [joint.rotation[-1]]
-
+    joint.getTransformation(transformations)
     for child in joint.child:
         applyTransformations(child, transformations)
     
@@ -107,18 +100,20 @@ def printH(joint):
         print("go back !")
         return
     print(joint.name, end=' ')
+    print(" ==> joint" + str(joint.numMaya))
     if(joint.isRoot):
-        print(joint.translation[:1], end=' ')
-        print(joint.rotation[:1], end=' \n')
+        print(len(joint.translation), end=' ')
+        print(len(joint.rotation), end=' \n')
     print(" Has children : ", end = '')
-    for child in joint.child:
-        print(child.name + " ", end = '')
-    print("\n") 
+    # for child in joint.child:
+    #     print(child.name + " ", end = '')
+    # print("\n") 
     liste = joint.child
     # for joints in liste:
     #     print(joints.name + " " +  str(joints.transformationIndex) , end=' ') 
-    # for joints in liste:
-    #     print(joints.rotation, end=' ')
+    for joints in liste:
+        print(joints.name, end=' ')
+        print(len(joints.rotation))
     print('\n\n')
     for child in joint.child:
         printH(child)

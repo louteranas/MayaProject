@@ -1,12 +1,12 @@
 #! /usr/bin/env python2.7
 
 class Joint:
-    def __init__(self, name = "Unknown", isRoot = False, transformationIndex = "-1", offset = [], rotation = [], translation = [], child = None, parent = None):
+    def __init__(self, name = "Unknown", isRoot = False, transformationIndex = "-1", offset = [], translation = [], child = None, parent = None):
         self.name = name
         self.isRoot = isRoot
         self.offset = offset
         self.position = (0, 0, 0)
-        self.rotation = rotation
+        self.rotation = []
         self.child = child
         self.translation = translation
         self.parent = parent
@@ -26,9 +26,6 @@ class Joint:
     def setTransformationIndex(self, index):
         self.transformationIndex = index
 
-    def setRotation(self, rotation):
-        self.rotation.append(rotation)
-
     def addChild(self, child):
         if(self.child == None):
             self.child = []
@@ -42,6 +39,18 @@ class Joint:
 
     def setNumMaya(self, number):
         self.numMaya = number
+    
+    def getTransformation(self, transformations):
+        if(self.isRoot):
+            self.translation.append([float(transformations[self.transformationIndex]), float(transformations[self.transformationIndex+1]), float(transformations[self.transformationIndex+2])])
+            rotation = [transformations[self.transformationIndex+5], transformations[self.transformationIndex+4], transformations[self.transformationIndex+3]]
+            # print(self.name, self.transformationIndex, [transformations[self.transformationIndex+5], transformations[self.transformationIndex+4], transformations[self.transformationIndex+3]])
+            self.rotation.append(rotation)
+        
+        else:
+            rotation = [transformations[self.transformationIndex+2], transformations[self.transformationIndex+1], transformations[self.transformationIndex]]
+            # print(self.name, self.transformationIndex, [transformations[self.transformationIndex+2], transformations[self.transformationIndex+1], transfor/ations[self.transformationIndex]])
+            self.rotation.append(rotation)
 
     def setTranslation(self, translation):
         if(self.isRoot):

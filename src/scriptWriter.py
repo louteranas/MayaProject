@@ -12,40 +12,58 @@ class ScriptWriter:
             return
         self.root = root 
     
-    def runTree(self, joint, script, lastParentList):
-        # tempLastParentList = lastParentList
-        print(joint.name)
+    def runTree(self, joint, script, positionParent):
         if(joint.isRoot):
-            # print("coucou Root")
-            # tempLastParentList += [1]*(len(joint.child))
             joint.setPosition(joint.translation[0])
             script.write("cmds.select(d=True )\n")
             position = (joint.position[0] + joint.offset[0], joint.position[1] + joint.offset[1], joint.position[2] + joint.offset[2])
+            joint.setPosition(position)
             script.write("cmds.joint(p=("+str(position[0])+\
                 ", "+str(position[1])+\
                 ", "+str(position[2]) + ")  )\n")
+            
         else:
-            # print(" JE suis un joint")
-            # if(not joint.child == None and len(joint.child)>1):
-            #     # print(joint.name)
-            #     tempLastParentList += [joint.numMaya]*(len(joint.child) -1)
-            position = (joint.parent.position[0] + joint.offset[0], joint.parent.position[1] + joint.offset[1], joint.parent.position[2] + joint.offset[2])
+            position = (positionParent[0] + joint.offset[0], positionParent[1] + joint.offset[1], positionParent[2] + joint.offset[2])
             joint.setPosition(position)
             script.write("cmds.joint(p=("+str(position[0])+\
                 ", "+str((position[1]))+\
                 ", "+str((position[2])) + ")  )\n")
-            script.write("cmds.joint('joint"+str(joint.parent.numMaya)+"', e=True, zso=True, oj='xyz' )\n")
+
             if(joint.child == None):
-                # print(" ca sort  ou ca sort pas ?")
                 return
         
-        # if(len(joint.child) > 1 ):
-        #     print(joint.name + " : " + str(len(joint.child)))
+        oldJoint = joint
         for child in joint.child:
-            self.runTree(child, script, lastParentList)
-            print(joint.name + " " + str(joint.numMaya))
             script.write("cmds.select('joint"+str(joint.numMaya)+"', r=True )\n")
-            # tempLastParentList.pop()
+            if child.parent != joint:
+                print("GROSSE ERREUR")
+            self.runTree(child, script, joint.position)
+    
+    def animate(self, joint, script, numFrame):
+        if(joint.child == None):
+            return
+        script.write("cmds.select('joint"+str(joint.numMaya)+"', r=True )\n")
+        if joint.isRoot :
+            # script.write("cmds.currentTime("+ str(numFrame*100 + joint.transformationIndex) +")\n") ,insert=True
+            script.write("cmds.move("+str(joint.translation[numFrame][0]) + "," + \
+            str(joint.translation[numFrame][1]) + "," + str(joint.translation[numFrame][2]) +", r=True )\n")
+
+            script.write("cmds.setKeyframe('joint"+ str(joint.numMaya) +".translate')\n" )
+            
+        
+        script.write("cmds.rotate("+str(joint.rotation[numFrame][0]) + "," + \
+            str(joint.rotation[numFrame][1]) + "," + str(joint.rotation[numFrame][2]) +", r=True )\n")
+        
+        
+        script.write("cmds.setKeyframe('joint"+ str(joint.numMaya) +".rotate')\n" )
+        script.write("cmds.setKeyframe('joint"+ str(joint.numMaya) +"', time="+ str(numFrame*100 + joint.transformationIndex) +")\n" )
+        # script.write("cmds.currentTime("+ str(numFrame*100 + joint.transformationIndex) +")\n")
+        script.write("cmds.setKeyframe('joint"+ str(joint.numMaya) +"', time="+ str(numFrame*100 + joint.transformationIndex) +")\n" )
+        for child in joint.child:
+            self.animate(child, script, numFrame)
+
+
+
 
     def writeScript(self):
         script = open('script.py', 'w')
@@ -53,4 +71,7 @@ class ScriptWriter:
         script.write("\n")
         script.write("import maya.cmds as cmds\n")
         self.runTree(self.root, script, [])
+        
+        for i in range(len(self.root.translation)):
+            self.animate(self.root, script, i)
         script.close()
