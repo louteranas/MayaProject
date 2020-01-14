@@ -7,9 +7,10 @@ import sys
 
 
 def main():
-    root = parser.parse(sys.argv[1])
+    root = parser.parse(sys.argv[1]) if len(sys.argv) > 1 else parser.parse("../bvhFiles/walk.bvh")
     scriptWriter = ScriptWriter(root)
     scriptWriter.writeScript()
     # parser.printH(root)
+
 
 main()
