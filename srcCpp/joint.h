@@ -27,6 +27,7 @@ enum RotateOrder {roXYZ=0, roYZX, roZXY, roXZY, roYXZ, roZYX};
 class Joint {
 public :
 	std::string _name;					// name of joint
+	int id_liste;
 	double _offX;						// initial offset in X
 	double _offY;						// initial offset in Y
 	double _offZ;						// initial offset in Z
@@ -51,7 +52,7 @@ public :
 	}
 
 	// Create from data :
-	static Joint* create(std::string name, double offX, double offY, double offZ, Joint* parent) {
+	static Joint* create(std::string name, double offX, double offY, double offZ, Joint* parent, int id_liste) {
 		Joint* child = new Joint();
 		child->_name = name;
 		child->_offX = offX;
@@ -63,18 +64,20 @@ public :
 		child->_curRx = 0;
 		child->_curRy = 0;
 		child->_curRz = 0;
-		if(parent != NULL) {
-			parent->_children.push_back(child);
-		}
+		child->id_liste = id_liste;
 		//Initialisation dofs
 		child->_dofs = std::vector<AnimCurve>();
-		child->_dofs.push_back(AnimCurve("Xposition"));
-		child->_dofs.push_back(AnimCurve("Yposition"));
-		child->_dofs.push_back(AnimCurve("Zposition"));
 		child->_dofs.push_back(AnimCurve("Xrotation"));
 		child->_dofs.push_back(AnimCurve("Yrotation"));
 		child->_dofs.push_back(AnimCurve("Zrotation"));
-
+		if (id_liste == 1) { //Si c'est le root
+			child->_dofs.push_back(AnimCurve("Xposition"));
+			child->_dofs.push_back(AnimCurve("Yposition"));
+			child->_dofs.push_back(AnimCurve("Zposition"));
+		}
+		if(parent != NULL) {
+			parent->_children.push_back(child);
+		}
 		return child;
 	}
 

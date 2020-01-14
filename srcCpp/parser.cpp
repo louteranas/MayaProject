@@ -43,10 +43,10 @@ Joint* readRoot(ifstream& flux){
     std::array<double, 3> offset = readOffset(flux);
     int nbChannels = readChannels(flux);
     //return new Joint("Root", true, offset, std::vector<std::array<float, 3>>(), std::vector<std::array<float, 3>>(), 0, NULL, std::list<Joint*>());
-    return Joint::create("Root", offset[0], offset[1], offset[2], NULL);
+    return Joint::create("Root", offset[0], offset[1], offset[2], NULL, 1);
 }
 
-string readJoint(ifstream& flux, Joint* parent, std::vector<Joint>& lJoints, string firstLine){
+string readJoint(ifstream& flux, Joint* parent, std::vector<Joint*>& lJoints, string firstLine){
     string str;
     istringstream ss(firstLine);
     ss >> str;
@@ -60,9 +60,9 @@ string readJoint(ifstream& flux, Joint* parent, std::vector<Joint>& lJoints, str
         string str;
         //getline(flux, str); //read {
         //Joint* joint = new Joint(jointName, false, offset, std::vector<std::array<float, 3>>(), std::vector<std::array<float, 3>>(), 0, parent, std::list<Joint*>());
-        Joint* joint = Joint::create(jointName, offset[0], offset[1], offset[2], parent);
+        Joint* joint = Joint::create(jointName, offset[0], offset[1], offset[2], parent, lJoints.size() + 1);
         //cout<<jointName<<endl;
-        lJoints.push_back(*joint);
+        lJoints.push_back(joint);
         //parent->addChild(joint);
         string newFirstLine, newLine;
         getline(flux  >> std::ws, newFirstLine);
@@ -82,8 +82,8 @@ string readJoint(ifstream& flux, Joint* parent, std::vector<Joint>& lJoints, str
         getline(flux >> std::ws, str);
         std::array<double, 3> offset = readOffset(flux);
         //Joint* joint = new Joint(jointName, false, offset, std::vector<std::array<float, 3>>(), std::vector<std::array<float, 3>>(), 0, parent, std::list<Joint*>());
-        Joint* joint = Joint::create(jointName, offset[0], offset[1], offset[2], parent);
-        lJoints.push_back(*joint);
+        Joint* joint = Joint::create(jointName, offset[0], offset[1], offset[2], parent, lJoints.size() + 1);
+        lJoints.push_back(joint);
         //parent->addChild(joint);
         getline(flux >> std::ws, str); //read }
         getline(flux >> std::ws, str);
@@ -125,8 +125,8 @@ float readFrameTime(ifstream& flux){
 }
 
 
-std::vector<Joint> parse(string argFile){
-    std::vector<Joint> lJoints;
+std::vector<Joint*> parse(string argFile){
+    std::vector<Joint*> lJoints;
     if(argFile.empty()){
         cout << "No file was given to parse"<<endl;
         exit(1);
@@ -139,7 +139,7 @@ std::vector<Joint> parse(string argFile){
     {
         cout << "Début de parsing du squelette" << endl;
         Joint* root = readRoot(flux);
-        lJoints.push_back(*root);
+        lJoints.push_back(root);
         //Tout est prêt pour la lecture.
         //ajouter while flux n'est pas fini..
 
@@ -167,21 +167,20 @@ std::vector<Joint> parse(string argFile){
         for (int i = 0; i < nbFrames; i++){
             getline(flux, str);
             istringstream ss(str);
-            ss >> rx >> ry >> rz >> tx >> ty >> tz;
+            ss >> tx >> ty >> tz >> rz >> ry >> rx;
             root->_dofs[0]._values.push_back(rx);
             root->_dofs[1]._values.push_back(ry);
             root->_dofs[2]._values.push_back(rz);
             root->_dofs[3]._values.push_back(tx);
             root->_dofs[4]._values.push_back(ty);
             root->_dofs[5]._values.push_back(tz);
-            for(std::vector<Joint>::iterator it = ++(lJoints.begin()); it != lJoints.end(); ++it) {
-                ss >> rx >> ry >> rz;
-                it->_dofs[0]._values.push_back(rx);
-                it->_dofs[1]._values.push_back(ry);
-                it->_dofs[2]._values.push_back(rz);
-                it->_dofs[3]._values.push_back(0);
-                it->_dofs[4]._values.push_back(0);
-                it->_dofs[5]._values.push_back(0);
+            for(std::vector<Joint*>::iterator it = ++(lJoints.begin()); it != lJoints.end(); ++it) {
+				if ((*it)->_name.find("/child") == std::string::npos) {
+					ss >> rz >> ry >> rx;
+					(*it)->_dofs[0]._values.push_back(rx);
+					(*it)->_dofs[1]._values.push_back(ry);
+					(*it)->_dofs[2]._values.push_back(rz);
+				}
             }
         }
         cout << "Fin de parsing du fichier" << endl;
