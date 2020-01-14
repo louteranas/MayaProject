@@ -80,7 +80,7 @@ def parse(argFile = None):
                 # return root
         for index, line in enumerate(lines[indexOfpos:]):
             transformations = line.split(" ")
-            if(not transformations == [''] and index == 0):
+            if(not transformations == [''] and index < 50):
                 transformations = [item for item in transformations]
                 # print(len(transformations))
                 applyTransformations(root, transformations)
