@@ -1,8 +1,7 @@
 #! /usr/bin/env python3
 
-from joint import Joint 
+from joint import Joint
 import sys
-from tqdm import tqdm
 import time
 
 def parse(argFile = None):
@@ -80,19 +79,19 @@ def parse(argFile = None):
                 # return root
         for index, line in enumerate(lines[indexOfpos:]):
             transformations = line.split(" ")
-            if(not transformations == [''] and index < 50):
+            if(not transformations == ['']):
                 transformations = [item for item in transformations]
                 # print(len(transformations))
                 applyTransformations(root, transformations)
     return root
-            
+
 def applyTransformations(joint, transformations):
     if(joint.child == None):
-        return 
+        return
     joint.getTransformation(transformations)
     for child in joint.child:
         applyTransformations(child, transformations)
-    
+
 
 
 def printH(joint):
@@ -107,17 +106,13 @@ def printH(joint):
     print(" Has children : ", end = '')
     # for child in joint.child:
     #     print(child.name + " ", end = '')
-    # print("\n") 
+    # print("\n")
     liste = joint.child
     # for joints in liste:
-    #     print(joints.name + " " +  str(joints.transformationIndex) , end=' ') 
+    #     print(joints.name + " " +  str(joints.transformationIndex) , end=' ')
     for joints in liste:
         print(joints.name, end=' ')
         print(len(joints.rotation))
     print('\n\n')
     for child in joint.child:
         printH(child)
-
-
-
-
