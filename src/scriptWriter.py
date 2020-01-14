@@ -49,16 +49,16 @@ class ScriptWriter:
             # script.write("cmds.move("+str(joint.translation[numFrame][0]) + "," + \
             # str(joint.translation[numFrame][1]) + "," + str(joint.translation[numFrame][2]) +", r=True )\n")
 
-            script.write("cmds.setKeyframe('joint"+ str(joint.numMaya) +", v="+str(joint.translation[numFrame][0])+" , attribute=translateX, time = "+str(numFrame*100 + joint.transformationIndex)+"')\n" )
-            script.write("cmds.setKeyframe('joint"+ str(joint.numMaya) +", v="+str(joint.translation[numFrame][2])+" , attribute=translateY, time = "+str(numFrame*100 + joint.transformationIndex)+"')\n" )
-            script.write("cmds.setKeyframe('joint"+ str(joint.numMaya) +", v="+str(joint.translation[numFrame][2])+" , attribute=translateZ, time = "+str(numFrame*100 + joint.transformationIndex)+"')\n" )
+            script.write("cmds.setKeyframe('joint"+ str(joint.numMaya) +", v="+str(joint.translation[numFrame][0])+" , attribute='translateX', time = "+str(numFrame*100 + joint.transformationIndex)+"')\n" )
+            script.write("cmds.setKeyframe('joint"+ str(joint.numMaya) +", v="+str(joint.translation[numFrame][2])+" , attribute='translateY', time = "+str(numFrame*100 + joint.transformationIndex)+"')\n" )
+            script.write("cmds.setKeyframe('joint"+ str(joint.numMaya) +", v="+str(joint.translation[numFrame][2])+" , attribute='translateZ', time = "+str(numFrame*100 + joint.transformationIndex)+"')\n" )
           
         
         
         
-        script.write("cmds.setKeyframe('joint"+ str(joint.numMaya) +", v="+str(joint.rotation[numFrame][2])+" , attribute=rotateZ, time = "+str(numFrame*100 + joint.transformationIndex)+"')\n" )
-        script.write("cmds.setKeyframe('joint"+ str(joint.numMaya) +", v="+str(joint.rotation[numFrame][1])+" , attribute=rotateY, time = "+str(numFrame*100 + joint.transformationIndex)+"')\n" )
-        script.write("cmds.setKeyframe('joint"+ str(joint.numMaya) +", v="+str(joint.rotation[numFrame][0])+" , attribute=rotateX, time = "+str(numFrame*100 + joint.transformationIndex)+"')\n" )
+        script.write("cmds.setKeyframe('joint"+ str(joint.numMaya) +", v="+str(joint.rotation[numFrame][2])+" , attribute='rotateZ', time = "+str(numFrame*100 + joint.transformationIndex)+"')\n" )
+        script.write("cmds.setKeyframe('joint"+ str(joint.numMaya) +", v="+str(joint.rotation[numFrame][1])+" , attribute='rotateY', time = "+str(numFrame*100 + joint.transformationIndex)+"')\n" )
+        script.write("cmds.setKeyframe('joint"+ str(joint.numMaya) +", v="+str(joint.rotation[numFrame][0])+" , attribute='rotateX', time = "+str(numFrame*100 + joint.transformationIndex)+"')\n" )
      
         # script.write("cmds.rotate("+str(joint.rotation[numFrame][0]) + "," + \
         #     str(joint.rotation[numFrame][1]) + "," + str(joint.rotation[numFrame][2]) +", r=True )\n")
