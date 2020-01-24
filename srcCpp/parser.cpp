@@ -1,9 +1,10 @@
 #include "parser.h"
 
-void skipIntro(ifstream& flux){ //skip jusque OFFSET
+void skipIntro(ifstream& flux, unsigned int nbLignes){ //skip nbLignes lignes
     string ligne;
-    for(int i = 0; i < 3; i ++)
+    for(int i = 0; i < nbLignes; i ++)
         getline(flux >> std::ws, ligne);
+    return;
 }
 
 std::array<double, 3> readOffset(ifstream& flux){
@@ -39,7 +40,7 @@ int readChannels(ifstream& flux){
 }
 
 Joint* readRoot(ifstream& flux){
-    skipIntro(flux);
+    skipIntro(flux, 3);
     std::array<double, 3> offset = readOffset(flux);
     int nbChannels = readChannels(flux);
     //return new Joint("Root", true, offset, std::vector<std::array<float, 3>>(), std::vector<std::array<float, 3>>(), 0, NULL, std::list<Joint*>());
@@ -124,9 +125,27 @@ float readFrameTime(ifstream& flux){
     return frameTime;
 }
 
+Joint* readSquelette(ifstream& flux, vector<Joint*>& lJoints) {
+    cout << "Début de parsing du squelette" << endl;
+    Joint* root = readRoot(flux);
+    lJoints.push_back(root);
+    //Tout est prêt pour la lecture.
+    //ajouter while flux n'est pas fini..
 
-std::vector<Joint*> parse(string argFile){
-    std::vector<Joint*> lJoints;
+    string firstLine;
+    getline(flux  >> std::ws, firstLine);
+    while(firstLine.front() != '}'){
+        firstLine = readJoint(flux, root, lJoints, firstLine);
+
+    }
+    getline(flux >> std::ws, firstLine);
+    cout << "Ligne après lecture du squelette : " <<firstLine << "\n";
+    return root;
+}
+
+
+vector<Joint*> parse(string argFile){
+    vector<Joint*> lJoints;
     if(argFile.empty()){
         cout << "No file was given to parse"<<endl;
         exit(1);
@@ -137,21 +156,7 @@ std::vector<Joint*> parse(string argFile){
     ifstream flux(argFile);  //Ouverture d'un fichier en lecture
     if(flux)
     {
-        cout << "Début de parsing du squelette" << endl;
-        Joint* root = readRoot(flux);
-        lJoints.push_back(root);
-        //Tout est prêt pour la lecture.
-        //ajouter while flux n'est pas fini..
-
-        string firstLine;
-        getline(flux  >> std::ws, firstLine);
-        while(firstLine.front() != '}'){
-            firstLine = readJoint(flux, root, lJoints, firstLine);
-            //getline(flux >> std::ws, firstLine);
-            //cout<<firstLine<<endl;
-        }
-        getline(flux >> std::ws, firstLine);
-        cout << "Ligne après lecture du squelette : " <<firstLine << "\n";
+        Joint* root = readSquelette(flux, lJoints);
 
       /*  for(std::list<Joint*>::iterator  it = lJoints.begin(); it != lJoints.end(); ++it){
           cout<< (*it)->toString()<<"\n";

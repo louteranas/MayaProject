@@ -1,14 +1,16 @@
 #ifndef _CREATE_H_
 #define _CREATE_H_
 
-#include <string>
+#include <cstring>
 #include <map>
 #include <vector>
 #include <stdio.h>
 #include <iostream>
 #include <fstream>
 #include <cmath>
-#include <filesystem>
+#include <experimental/filesystem>
+
+using namespace std;
 
 class Quaternion {
 public:
@@ -18,6 +20,12 @@ public:
 		this->x = x;
 		this->y = y;
 		this->z = z;
+	}
+	Quaternion() {
+		this->w = 1;
+		this->x = 0;
+		this->y = 0;
+		this->z = 0;
 	}
 	//Attributes
 	double w;
@@ -38,14 +46,14 @@ public:
 		*q_inv /= (pow(this->norme(), 2));
 		return q_inv;
 	}
-	//Définition de l'opérateur "quaternion /= double"
+	//Dï¿½finition de l'opï¿½rateur "quaternion /= double"
 	Quaternion& operator/=(const double& scal)
 	{
 		this->w /= scal;
 		this->x /= scal;
 		this->y /= scal;
 		this->z /= scal;
-		return *this; 
+		return *this;
 	}
 	//Converts quaternion to Euler angles
 	const double* projection_xyz() {
@@ -58,7 +66,10 @@ public:
 		double ksi = atan2(2 * (this->w * this->z + this->x * this->y),
 			1 - 2 * (this->y * this->y + this->z * this->z));
 		//Return in an array
-		double proj[3] = { phi, theta, ksi };
+		double* proj = new double(3);
+		proj[0] = phi * 180 / M_PI;
+		proj[1] = theta * 180 / M_PI;
+		proj[2] = ksi * 180 / M_PI;
 		return proj;
 	}
 	//Returns multiplication of current Quaternion with another one,
@@ -76,6 +87,17 @@ public:
 		Quaternion* q_rel = this->multiply(inv_parent);
 		return q_rel->projection_xyz();
 	}
+	Quaternion& operator=(const Quaternion& other) // copy assignment
+	{
+		this->w = other.w;
+		this->x = other.x;
+		this->y = other.y;
+		this->z = other.z;
+		return *this;
+	}
 };
+void read_mesure(string filename, map<string, vector<Quaternion*>>& mesures, int& nbFrames);
+void extractFilename(string& path);
+void createBvhFile(map<string, vector<Quaternion*>> mesures, int nbFrames);
 
 #endif
